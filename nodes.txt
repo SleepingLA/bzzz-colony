@@ -1,0 +1,6 @@
+# Nodes list and ROLE(s)
+# compute-1-1 CLIENT STORAGE META MGMT
+# compute-1-2 CLIENT STORAGE META 
+# compute-1-3 CLIENT STORAGE
+nodename1 STORAGE META MGMT
+nodename2 STORAGE META 
