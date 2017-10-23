@@ -24,6 +24,8 @@ do
  sed -i 's,^\(storeStorageDirectory[ ]*=\).*,\1'/state/partition1/beegfs_storage',g' $newname
  sed -i 's,^\(tuneStorageSpaceLowLimit[ ]*=\).*,\1'50G',g' $newname
  sed -i 's,^\(tuneStorageSpaceEmergencyLimit[ ]*=\).*,\1'8G',g' $newname
+ # conflict with docker?
+ sed -i 's,^\(connInterfacesFile[ ]*=\).*,\1'/etc/beegfs/if.conf',g' $newname
  #sed -i 's,^\([ ]*=\).*,\1'',g' $newname
 done
 
@@ -40,8 +42,23 @@ do
  scp ${confdir}/beegfs-client-autobuild.conf ${node}:/etc/beegfs/ 
  scp ${confdir}/beegfs-client.conf    ${node}:/etc/beegfs/
  scp ${confdir}/beegfs-storage.conf ${node}:/etc/beegfs/
- ssh ${node} /etc/init.d/beegfs-client rebuild
+ # default interface
+ ssh ${node} "echo ib0 > /etc/beegfs/if.conf"
+ 
+ #IB
+ IB=1
+ if [ IB -eq 1 ] ; then
+  ssh ${node} beegfs-setup-rdma -r
+  ssh ${node} beegfs-setup-rdma  #symbolic link
+  ssh ${node} /etc/init.d/beegfs-client rebuild
+ else
+  ssh ${node} beegfs-setup-rdma -i off
+ fi
 
+ #
+ # conflict with docker?
+ #ssh ${node} service docker stop
+ #ssh ${node} ip link del docker0
 done
 
 
