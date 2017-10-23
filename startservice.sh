@@ -5,12 +5,12 @@ cmd=start
 
 
 
-echo demarrage du node mgmt
+echo starting mgmt node
 mgmt=$(list_mgmt)
 ssh ${mgmt} service beegfs-mgmtd start
 
 sleep 2
-echo demarrage des node meta
+echo starting meta nodes
 
 liste=$(list_meta)
 for node in $liste
@@ -20,7 +20,7 @@ do
 done
 
 sleep 2
-echo demarrage des node storage
+echo starting storage nodes
 
 liste=$(list_storage)
 for node in $liste
@@ -31,17 +31,14 @@ do
 done
 
 sleep 5
-echo demarrage des nodemount
+echo starting client
 
 #START CLIENT
 liste=$(list_client)
 for node in $liste
 do
-	#nouveau
 	ssh ${node} service beegfs-helperd $cmd
-
-	#ssh ${node} service beegfs-client scmd
-	ssh ${node} /etc/init.d/beegfs-client start
+	ssh ${node} service beegfs-client $cmd
 
 done
 
