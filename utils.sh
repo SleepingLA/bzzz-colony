@@ -1,6 +1,9 @@
 #/bin/bash
 
 nodefile=nodes.txt
+#
+export IB=1
+
 
 #todo init
 #nodefile=$1

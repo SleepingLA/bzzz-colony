@@ -2,8 +2,6 @@
 
 source utils.sh
 
-IB=1
-
 liste=$(list_client)
 for node in $liste
 do

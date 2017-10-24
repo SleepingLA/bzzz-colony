@@ -1,8 +1,4 @@
 
-#beegfs-setup-rdma
-#
-# faut sassurer que rdma soit installer sinon les storage nodes ne se parleront pas
-#
 
 source utils.sh
 
@@ -26,6 +22,12 @@ do
  sed -i 's,^\(tuneStorageSpaceEmergencyLimit[ ]*=\).*,\1'8G',g' $newname
  # conflict with docker?
  sed -i 's,^\(connInterfacesFile[ ]*=\).*,\1'/etc/beegfs/if.conf',g' $newname
+ # beegfs-client-autobuild.conf
+ if [ $IB -eq 1 ] ; then
+  sed -i 's,^\(buildArgs[ ]*=\).*,\1'"-j8 BEEGFS_OPENTK_IBVERBS=1"',g' $newname
+ else
+  sed -i 's,^\(buildArgs[ ]*=\).*,\1'-j8',g' $newname
+ fi
  #sed -i 's,^\([ ]*=\).*,\1'',g' $newname
 done
 
@@ -43,20 +45,26 @@ do
  scp ${confdir}/beegfs-client.conf    ${node}:/etc/beegfs/
  scp ${confdir}/beegfs-storage.conf ${node}:/etc/beegfs/
  # default interface
- ssh ${node} "echo ib0 > /etc/beegfs/if.conf"
+ # docker conflict (if IB=0)
+ #ssh ${node} "echo eno1 > /etc/beegfs/if.conf"
+ ssh ${node} "echo ib0 > /etc/beegfs/if.conf"  #IPOIB
+
  
  #IB
- IB=1
- if [ IB -eq 1 ] ; then
+ if [ $IB -eq 1 ] ; then
+  # default included lib
+  #ssh ${node} beegfs-setup-rdma
+  # compiled lib
   ssh ${node} beegfs-setup-rdma -r
   ssh ${node} beegfs-setup-rdma  #symbolic link
   ssh ${node} /etc/init.d/beegfs-client rebuild
  else
+  ssh ${node} /etc/init.d/beegfs-client rebuild
   ssh ${node} beegfs-setup-rdma -i off
  fi
 
  #
- # conflict with docker?
+ # conflict with docker? ---> define if.conf 
  #ssh ${node} service docker stop
  #ssh ${node} ip link del docker0
 done
