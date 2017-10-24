@@ -1,2 +1,21 @@
 # bzzz-colony
-push config on centos nodes and start services
+Deploy RPMs, push BeeGFS config on centos nodes and start services
+
+
+Steps: 
+
+Complete nodefile
+Activate RDMA support util.sh
+
+deploy_rpm.sh
+push_conf_file.sh
+startservice.sh
+
+stopservice.sh
+clean_local_disk.sh
+
+
+TODO
+
+buddy-mirror, etc
+
